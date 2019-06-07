@@ -518,32 +518,17 @@ def register():
 
         session['token'] = None
 
-        # location: url_for('get_user')
-        # (jsonify({'username': user.username}), 201,
-            # {'Location': url_for('get_user', id=user.id, _external=True)})
-
-        # return (flask.jsonify({"id": new_ID, 'username': form.username.data,"password": new_hash}), {'Location': url_for('get_user', username=form.username.data, _external=True})), 201
         return flask.jsonify({'Location': url_for('get_user', username=form.username.data, _external=True), 'id': new_ID, 'username': form.username.data, 'password': new_hash}), 201
-
-
-        # return flask.jsonify(result=results), 201
 
     return render_template('register.html',  title='Register', form=form)
 
 
 @app.route('/api/users/<username>')
 def get_user(username):
-    # # user = User.query.get(id)
-    # user = User(id).get_id()
-    # if not user:
-    #     flask.abort(400)
-    # return flask.jsonify({'username': user.username})
-
     """
-    Utility for getting the 
+    Utility for getting the URI of the new user
     """
-    query = {'username': username}
-    user = db.usersdb.find(query)
+    user = db.usersdb.find({'username': username})
     if not user:
         flask.abort(400)
     return flask.jsonify({'username': user['username'],'id':user['id']})

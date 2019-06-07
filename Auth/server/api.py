@@ -46,6 +46,7 @@ DEFAULT = 10 # top default for resources
 users = db.usersdb
 
 RECORDS = {}
+session['token'] = None
 
 ###
 # Pages
@@ -489,7 +490,6 @@ def register():
             "password": new_hash
         }
 
-        session['token'] = None
         return flask.jsonify(result=results), 201
 
     return render_template('register.html',  title='Register', form=form)

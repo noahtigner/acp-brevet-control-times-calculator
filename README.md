@@ -1,89 +1,54 @@
 # Project 7: Adding authentication and user interface to brevet time calculator service
 
-## What is in this repository
+An improved version of the offical ACP calculator.
 
-You have a minimal implementation of password- and token-based authentication modules in "Auth" folder, using which you can create authenticated REST API-based services (as demonstrated in class). 
+## ACP controle times
 
-## Recap 
+Controls are points where a rider must obtain proof of passage, and control[e] times are the minimum and maximum times by which the rider must arrive at the location.   
 
-You will reuse *your* code from project 6 (https://bitbucket.org/UOCIS322/proj6-rest/). Recall: you created the following three parts: 
+The algorithm for calculating controle times is described here (https://rusa.org/pages/acp-brevet-control-times-calculator). Additional background information is given here (https://rusa.org/pages/rulesForRiders).  
 
-* You designed RESTful services to expose what is stored in MongoDB. Specifically, you used the boilerplate given in DockerRestAPI folder, and created the following:
+Essentially, each range of control distances has associated minimum and maximum speeds. The algorithm calculates open and close times based on the amount of time spent in each interval, as shown in the links above. A control at 0 km has a close at 1 hour, and a control farther than 120% of the brevet distance is not allowed. Controls between 100% and 120% the distance of the brevet use the brevet's distance for calculations.
 
-** "http://<host:port>/listAll" should return all open and close times in the database
+For example, on a 300 km brevet, with controls at 0km, 200km, and 300km, we have
+    * Open Times: 0km = 0, 200km = 200/34, 300 = 200/34 + 100/32, where 34 and 32 are the associated max        speeds for 0-200km and 200-400km
+    * Close Times: 0km = 1 hour, 200km = 200/15, 300km = 200/15 + 100/15, where 34 and 32 are the associated    min speeds for 0-200km and 200-400km
 
-** "http://<host:port>/listOpenOnly" should return open times only
+## Use
 
-** "http://<host:port>/listCloseOnly" should return close times only
+Build and run a container using the included Dockerfile. At http://0.0.0.0:5000/, choose a brevet distance (miles or km) and start time, and select the controles in either miles or kilometers. The calculator will calculate the open and close times without the page reloading.
 
-* You also designed two different representations: one in csv and one in json. For the above, JSON should be your default representation. 
+The submit button can be used to save the control times to a database.
 
-** "http://<host:port>/listAll/csv" should return all open and close times in CSV format
+Users can register, login, and logout. 
+Registering successfully will store the user's credentials in the database and return a JSON object including their unique id, username, and hashed password. After registering and logging in, visit http://0.0.0.0:5000/api/token to be issues a token. Only after logging in and being granted a token can the user access the protected resources (shown below).
 
-** "http://<host:port>/listOpenOnly/csv" should return open times only in CSV format
+The display button brings up a page where these values are displayed in a table. Displaying also clears the database or future use. Redirecting back to the calculator from the display page will refresh the page and remove its contents. 
 
-** "http://<host:port>/listCloseOnly/csv" should return close times only in CSV format
+The contents of the database can also be listed in json or csv format. Specify listAll, listOpenOnly, or listCloseOnly. Additionally, specifying an amount or 'top' values to be shown is possible.
+For example, after submitting controle times to the database and successfully authenticating, redirect to http://0.0.0.0:5000/listAll/csv?top=1. 
 
-** "http://<host:port>/listAll/json" should return all open and close times in JSON format
+These options can also be selected via a consumer program by accessing port 5001, or http://0.0.0.0:5001. 
 
-** "http://<host:port>/listOpenOnly/json" should return open times only in JSON format
+## Security
 
-** "http://<host:port>/listCloseOnly/json" should return close times only in JSON format
+This program includes password based authentication as well as token-based authentication. Passwords are hashed and stored securely in the database along the user's name and unique id. Users can register, login, and logout via the  three buttons above the calculator. Tokens are required to access the contents of the database. To get a token, login and then visit http://0.0.0.0:5000/api/token. This token is valid for approximately 60 seconds. CSRF protection is also built in.
+ 
+## Testing
 
-* You also added a query parameter to get top "k" open and close times. For examples, see below.
+An automated nose test suite is included. Run 'nosetests' to test server-side logic.
 
-** "http://<host:port>/listOpenOnly/csv?top=3" should return top 3 open times only (in ascending order) in CSV format 
+Calculations and server-side logic are done with Flask and Python. Javascript and AJAX are used to take input and display output. 
 
-** "http://<host:port>/listOpenOnly/json?top=5" should return top 5 open times only (in ascending order) in JSON format
+The display button will not function if nothing has been submitted.
+The submit button will not work if nothing is there to submit.
 
-* You'll also designed consumer programs (e.g., in jQuery) to expose the services.
+The RESTful implementation can be tested by submitting data to the database before accessing http://0.0.0.0:5001. 
 
-## Functionality you will add
+Users are not able to access the contents of the database on port 5000 without logging in an being granted a token. Logging out destroys the token.
 
-In this project, you will add the following functionality:
+## Author
 
-### Part 1: Authenticating the services 
+Noah Tigner
 
-- POST **/api/register**
-
-Registers a new user. On success a status code 201 is returned. The body of the response contains a JSON object with the newly added user. A `Location` header contains the URI of the new user. On failure status code 400 (bad request) is returned. Note: The password is hashed before it is stored in the database. Once hashed, the original password is discarded. Your database should have three fields: id (unique index), username and password for storing the credentials.
-
-- GET **/api/token**
-
-Returns a token. This request must be authenticated using a HTTP Basic Authentication (see password.py for example). On success a JSON object is returned with a field `token` set to the authentication token for the user and a field `duration` set to the (approximate) number of seconds the token is valid. On failure status code 401 (unauthorized) is returned.
-
-- GET **/RESOURCE-YOU-CREATED-IN-PROJECT-6**
-
-Return a protected <resource>, which is basically what you created in project 6. This request must be authenticated using token-based authentication only (see testToken.py). HTTP password-based (basic) authentication is not allowed. On success a JSON object with data for the authenticated user is returned. On failure status code 401 (unauthorized) is returned.
-
-### Part 2: User interface
-
-The goal of this part of the project is to create frontend/UI for Brevet app using Flask-WTF and Flask-Login introduced in lectures. You frontend/UI should use the authentication that you created above. In addition to creating UI for basic authentication and token generation, you will add three additional functionalities in your UI: (a) remember me, (b) logout, and (c) CSRF protection. Note: You don’t have to maintain sessions.
-
-## Tasks
-
-You'll turn in your credentials.ini using which we will get the following:
-
-* The working application with two parts.
-
-* Dockerfile
-
-* docker-compose.yml
-
-## Grading Rubric
-
-* If your code works as expected: 100 points. This includes:
-    * Basic APIs work as expected in part 1.
-    * Decent user interface in part 2 including three functionalities in the UI.
-
-* For each non-working API in part 1, 15 points will be docked off. Part 1 carries 45 points.
-
-* For the UI and the three functionalies, decent UI carries 15 points. Each functionality carries 10 points. In short, part 2 carries 45 points.
-
-* If none of them work, you'll get 10 points assuming
-    * README is updated with your name and email ID.
-    * The credentials.ini is submitted with the correct URL of your repo.
-    * Dockerfile is present. 
-    * Docker-compose.yml works/builds without any errors.
-
-* If the Docker-compose.yml doesn't build or if credentials.ini is missing, 0 will be assigned.
+nzt@cs.uoregon.edu

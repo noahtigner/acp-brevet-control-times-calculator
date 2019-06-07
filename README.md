@@ -21,14 +21,14 @@ Build and run a container using the included Dockerfile. At http://0.0.0.0:5000/
 The submit button can be used to save the control times to a database.
 
 Users can register, login, and logout. 
-Registering successfully will store the user's credentials in the database and return a JSON object including their unique id, username, and hashed password. After registering and logging in, visit http://0.0.0.0:5000/api/token to be issues a token. Only after logging in and being granted a token can the user access the protected resources (shown below).
+Registering successfully will store the user's credentials in the database and return a JSON object including their URI, unique id, username, and hashed password. After registering and logging in, visit http://0.0.0.0:5000/api/token to be issues a token. Only after logging in and being granted a token can the user access the protected resources (shown below).
 
 The display button brings up a page where these values are displayed in a table. Displaying also clears the database or future use. Redirecting back to the calculator from the display page will refresh the page and remove its contents. 
 
 The contents of the database can also be listed in json or csv format. Specify listAll, listOpenOnly, or listCloseOnly. Additionally, specifying an amount or 'top' values to be shown is possible.
 For example, after submitting controle times to the database and successfully authenticating, redirect to http://0.0.0.0:5000/listAll/csv?top=1. 
 
-These options can also be selected via a consumer program by accessing port 5001, or http://0.0.0.0:5001. 
+These options can also be selected via a consumer program by accessing port 5001, or http://0.0.0.0:5001 (this feature has been deprecated on this version) 
 
 ## Security
 

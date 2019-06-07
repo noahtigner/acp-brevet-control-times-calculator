@@ -159,7 +159,10 @@ class All(Resource):
         # Grab token from session variable or request arg
         # if session['token'] == None:
         if "token" in session:
-            token = request.args.get('token')
+            if session['token'] == None:
+                token = request.args.get('token')
+            else:
+                token = session['token']
         else:
             token = session['token']
 

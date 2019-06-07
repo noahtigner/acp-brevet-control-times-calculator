@@ -518,9 +518,29 @@ def register():
 
         session['token'] = None
 
-        return flask.jsonify(result=results), 201
+        # location: url_for('get_user')
+        # (jsonify({'username': user.username}), 201,
+            # {'Location': url_for('get_user', id=user.id, _external=True)})
+
+        return (flask.jsonify({'username': form.username.data}), 201, {'Location': url_for('get_user', username=form.username.data, _external=True)})
+
+        # return flask.jsonify(result=results), 201
 
     return render_template('register.html',  title='Register', form=form)
+
+@app.route('/api/users/<username>')
+def get_user(username):
+    # # user = User.query.get(id)
+    # user = User(id).get_id()
+    # if not user:
+    #     flask.abort(400)
+    # return flask.jsonify({'username': user.username})
+    query = {'username': username}
+    user = db.usersdb.find(query)
+    if not user:
+        flask.abort(400)
+    return flask.jsonify({'username': user['username'],'id':user['id']})
+
 
 def newID():
     """

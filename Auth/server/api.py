@@ -135,6 +135,7 @@ def _submit():
     return flask.jsonify(result=result)
 
 @app.route("/display")
+@login_required
 def _display():
     RECORDS.clear()
 

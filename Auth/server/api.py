@@ -157,7 +157,8 @@ class All(Resource):
     def get(self):
 
         # Grab token from session variable or request arg
-        if session['token'] == None:
+        # if session['token'] == None:
+        if "token" in session:
             token = request.args.get('token')
         else:
             token = session['token']
@@ -488,7 +489,7 @@ def register():
             "username": form.username.data,
             "password": new_hash
         }
-        
+
         session['token'] = None
 
         return flask.jsonify(result=results), 201

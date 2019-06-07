@@ -157,7 +157,6 @@ class All(Resource):
     def get(self):
 
         # Grab token from session variable or request arg
-        # if session['token'] == None:
         if "token" in session:
             if session['token'] == None:
                 token = request.args.get('token')
@@ -190,10 +189,13 @@ class AllJSON(Resource):
     def get(self):
 
         # Grab token from session variable or request arg
-        if session['token'] == None:
-            token = request.args.get('token')
+        if "token" in session:
+            if session['token'] == None:
+                token = request.args.get('token')
+            else:
+                token = session['token']
         else:
-            token = session['token']
+            token = request.args.get('token')
             
         # Authentication failure
         if token == None:
@@ -218,10 +220,13 @@ class AllCSV(Resource):
     def get(self):
 
         # Grab token from session variable or request arg
-        if session['token'] == None:
-            token = request.args.get('token')
+        if "token" in session:
+            if session['token'] == None:
+                token = request.args.get('token')
+            else:
+                token = session['token']
         else:
-            token = session['token']
+            token = request.args.get('token')
             
         # Authentication failure
         if token == None:
@@ -246,10 +251,13 @@ class Open(Resource):
     def get(self):
 
         # Grab token from session variable or request arg
-        if session['token'] == None:
-            token = request.args.get('token')
+        if "token" in session:
+            if session['token'] == None:
+                token = request.args.get('token')
+            else:
+                token = session['token']
         else:
-            token = session['token']
+            token = request.args.get('token')
             
         # Authentication failure
         if token == None:
@@ -273,10 +281,13 @@ class OpenJSON(Resource):
     def get(self):
 
         # Grab token from session variable or request arg
-        if session['token'] == None:
-            token = request.args.get('token')
+        if "token" in session:
+            if session['token'] == None:
+                token = request.args.get('token')
+            else:
+                token = session['token']
         else:
-            token = session['token']
+            token = request.args.get('token')
             
         # Authentication failure
         if token == None:
@@ -300,10 +311,13 @@ class OpenCSV(Resource):
     def get(self):
 
         # Grab token from session variable or request arg
-        if session['token'] == None:
-            token = request.args.get('token')
+        if "token" in session:
+            if session['token'] == None:
+                token = request.args.get('token')
+            else:
+                token = session['token']
         else:
-            token = session['token']
+            token = request.args.get('token')
             
         # Authentication failure
         if token == None:
@@ -328,10 +342,13 @@ class Close(Resource):
     def get(self):
 
         # Grab token from session variable or request arg
-        if session['token'] == None:
-            token = request.args.get('token')
+        if "token" in session:
+            if session['token'] == None:
+                token = request.args.get('token')
+            else:
+                token = session['token']
         else:
-            token = session['token']
+            token = request.args.get('token')
             
         # Authentication failure
         if token == None:
@@ -355,10 +372,13 @@ class CloseJSON(Resource):
     def get(self):
 
         # Grab token from session variable or request arg
-        if session['token'] == None:
-            token = request.args.get('token')
+        if "token" in session:
+            if session['token'] == None:
+                token = request.args.get('token')
+            else:
+                token = session['token']
         else:
-            token = session['token']
+            token = request.args.get('token')
             
         # Authentication failure
         if token == None:
@@ -382,10 +402,13 @@ class CloseCSV(Resource):
     def get(self):
 
         # Grab token from session variable or request arg
-        if session['token'] == None:
-            token = request.args.get('token')
+        if "token" in session:
+            if session['token'] == None:
+                token = request.args.get('token')
+            else:
+                token = session['token']
         else:
-            token = session['token']
+            token = request.args.get('token')
             
         # Authentication failure
         if token == None:

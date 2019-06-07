@@ -164,7 +164,7 @@ class All(Resource):
             else:
                 token = session['token']
         else:
-            token = session['token']
+            token = request.args.get('token')
 
         # Authentication failure
         if token == None:

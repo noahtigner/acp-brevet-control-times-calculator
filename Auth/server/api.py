@@ -541,10 +541,6 @@ def newID():
     return random.randint(1, 999999)
 
 class User(UserMixin):
-    # def __init__(self, name, id, active=True):
-    #     self.name = name
-    #     self.id = id
-    #     self.active = active
 
     def __init__(self, id, active=True):
         self.id = id #.decode('utf8')

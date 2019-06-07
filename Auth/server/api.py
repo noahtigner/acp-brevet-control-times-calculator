@@ -14,7 +14,6 @@ import logging
 import pymongo
 from pymongo import MongoClient
 import os
-
 from forms import LoginForm, RegisterForm
 from flask_login import (LoginManager, current_user, login_required,
                             login_user, logout_user, UserMixin, 
@@ -27,7 +26,6 @@ from itsdangerous import (TimedJSONWebSignatureSerializer \
 import time
 from flask_wtf.csrf import CSRFProtect
 from urllib.parse import urlparse, urljoin
-# from urlparse import urlparse, urljoin
 
 
 
@@ -109,6 +107,9 @@ def _calc_times():
 
 @app.route("/submit")
 def _submit():
+    """
+    Save the entries listed on screen into the database
+    """
     
     try:
         if len(RECORDS) == 0:
@@ -137,6 +138,9 @@ def _submit():
 @app.route("/display")
 @login_required
 def _display():
+    """
+    Display all saved brevet times
+    """
     RECORDS.clear()
 
     _items = db.tododb.find()
@@ -148,8 +152,6 @@ def _display():
         item['close'] = arrow.get(item['close']).format('dddd D/M HH:mm')
 
     return render_template('display.html', items=items)
-
-################################################################################################################################
 
 class All(Resource):
     def get(self):
@@ -412,27 +414,21 @@ api.add_resource(Close, '/listCloseOnly')
 api.add_resource(CloseJSON, '/listCloseOnly/json')
 api.add_resource(CloseCSV, '/listCloseOnly/csv')
 
-################################################################################################################################
-
-# TODO: CSRF
-
+# For testing
 @app.route('/api/a', methods=['GET', 'POST'])
 def a():
     _users = db.usersdb.find()
     users = [user for user in _users]
-
     result = {}
     for user in users:
         flash(user['username'])
-    #     result[str(user['username'])] = user['password']
-
-    # result = {"success": False, "error": "Failed to submit to db"}
-
     return flask.jsonify(result=result)
-
 
 @app.route('/api/login', methods=['GET', 'POST'])
 def login():
+    """
+    Verifies that the user exists and the password matches
+    """
     form = LoginForm()
     if form.validate_on_submit():
         # flash('Login requested for user {}, remember_me={}'.format(
@@ -450,7 +446,6 @@ def login():
             flash("Incorrect Password")
             return redirect(url_for('login'))
 
-
         u = User(user['id'])
         session['id'] = user['id']
         if login_user(u, remember=form.remember_me.data):
@@ -458,18 +453,20 @@ def login():
         else:
             flash("failed to login")
 
-
         next = request.args.get("next")
         if not is_safe_url(next):
             return flask.abort(400)
         if next:
             return redirect(next)
         return redirect('/')
-        # return redirect(request.args.get("next") or url_for("index"))
+
     return render_template('login.html',  title='Sign In', form=form)
 
 @app.route('/api/register', methods=['GET', 'POST'])
 def register():
+    """
+    Stores the username and password, along with a unique id
+    """
     form = RegisterForm()
     if form.validate_on_submit():
         # flash('Register requested for user {}, remember_me={}'.format(
@@ -486,24 +483,23 @@ def register():
         }
         users.insert_one(new_user)
 
-        # flash(verify_password(form.password.data, new_hash))
-        # flash(verify_password(form.password.data,users.find_one({"username": form.username.data})['password']))
-
         results = {
             "Location": new_ID,
             "username": form.username.data,
             "password": new_hash
         }
-        # return redirect(request.args.get("next") or url_for("index"))
+
         session['token'] = None
         return flask.jsonify(result=results), 201
+
     return render_template('register.html',  title='Register', form=form)
 
 def newID():
+    """
+    Generates a new unique id
+    """
     return random.randint(1, 999999)
 
-
-# your user class 
 class User(UserMixin):
     # def __init__(self, name, id, active=True):
     #     self.name = name
@@ -511,7 +507,7 @@ class User(UserMixin):
     #     self.active = active
 
     def __init__(self, id, active=True):
-        self.id = id#.decode('utf8')
+        self.id = id #.decode('utf8')
         self.active = active
 
     def is_active(self):
@@ -526,25 +522,13 @@ class User(UserMixin):
     def get_id(self):
         return self.id
 
-# note that the ID returned must be unicode
-# USERS = {
-#     1: User(u"A", 1),
-#     2: User(u"B", 2),
-# }
-
-# USER_NAMES = dict((u.name, u) for u in USERS.values())
-
-# step 1 in slides
 login_manager = LoginManager()
 login_manager.setup_app(app)
 login_manager.session_protection = "strong"
-
-# step 6 in the slides
 login_manager.login_view = u"login"
 login_manager.login_message = u"Please log in to access this page."
 login_manager.refresh_view = u"reauth"
 
-# step 2 in slides 
 @login_manager.user_loader
 def load_user(ID):
     # return USERS.get(int(id))
@@ -558,7 +542,6 @@ def load_user(ID):
 def secret():
     return render_template("404.html")  # Test
 
-# step 5 in slides
 @app.route("/reauth", methods=["GET", "POST"])
 @login_required
 def reauth():
@@ -568,7 +551,6 @@ def reauth():
         return redirect(request.args.get("next") or url_for("index"))
     return render_template("reauth.html")
 
-
 @app.route("/logout")
 @login_required
 def logout():
@@ -576,8 +558,6 @@ def logout():
     flash("Logged out.")
     session['token'] = None
     return redirect(url_for("index"))
-
-
 
 def generate_auth_token(id, expiration=600):
     s = Serializer(app.secret_key, expires_in=expiration)
@@ -597,14 +577,17 @@ def verify_auth_token(token):
 @app.route("/api/token")
 @login_required
 def token():
+    """
+    Generates a token if the user has successfully logged in.
+    This token can be copy/pasted by the user, and is stored in the session variable
+    """
 
     try:
+        # Generate a token
         id = session.get('id')
         tokenInfo = generate_auth_token(id, 600)
-
         t = tokenInfo['token'].decode('utf-8')
         result = {'token': t, 'duration': 60}
-
         session['token'] = t
         return flask.jsonify(result=result)
     except:
@@ -616,8 +599,6 @@ def is_safe_url(target):
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and \
            ref_url.netloc == test_url.netloc
-
-
 
 ################################################################################################################################
 

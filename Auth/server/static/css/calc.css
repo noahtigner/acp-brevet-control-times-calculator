@@ -6,6 +6,16 @@
  * add more specific styles. 
  */
 
-.flashes{
-    color: red;
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    background-color: rgba(41, 53, 53, 0.664);
+    color: rgb(223, 223, 223);
 }
+
+.flashes {
+    color: red;
+    font-weight: bold;
+}
+

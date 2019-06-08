@@ -42,6 +42,7 @@
     <input id="login" type="button" value="login" onclick="login();" />
     <input id="register" type="button" value="register" onclick="register();" />
     <input id="logout" type="button" value="logout" onclick="logout();" />
+    <input id="token" type="button" value="token" onclick="token();" />
     <br/>
 
     {% with messages = get_flashed_messages() %}
@@ -144,6 +145,10 @@
 
       function logout(){
         window.location = "/logout"; 
+      }
+
+      function token(){
+        window.location = "/api/token"; 
       }
 
       function submit() {

@@ -618,6 +618,7 @@ def verify_auth_token(token):
 
 #@login_required
 @app.route("/api/token")
+@login_required
 def token():
     """
     Generates a token if the user has successfully logged in.

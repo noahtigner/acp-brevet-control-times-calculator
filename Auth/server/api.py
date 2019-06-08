@@ -477,7 +477,7 @@ def login():
         session['id'] = user['id']
         if login_user(u, remember=form.remember_me.data):
             flash("login successful")
-            u.set_authenticated(True)
+            # u.set_authenticated(True)
         else:
             flash("failed to login")
 

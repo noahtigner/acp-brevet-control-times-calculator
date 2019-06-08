@@ -546,16 +546,16 @@ class User(UserMixin):
     def __init__(self, id, active=True):
         self.id = id #.decode('utf8')
         self.active = active
-        self.authenticated = False
+        # self.authenticated = False
 
     def is_active(self):
         return self.active
 
     def is_authenticated(self):
-        return self.authenticated
+        return True
 
-    def set_authenticated(self, auth):
-            self.authenticated = auth
+    # def set_authenticated(self, auth):
+    #         self.authenticated = auth
 
     def is_anonymous(self):
         return False
@@ -598,7 +598,7 @@ def logout():
     logout_user()
     flash("Logged out.")
     session['token'] = None
-    u.set_authenticated(False)
+    # u.set_authenticated(False)
     return redirect(url_for("index"))
 
 def generate_auth_token(id, expiration=600):
@@ -629,16 +629,15 @@ def token():
         # Generate a token
         id = session.get('id')
 
-        user = User(id)
-        if user.is_authenticated():
+        # user = User(id)
+        # if user.is_authenticated():
 
-            tokenInfo = generate_auth_token(id, 600)
-            t = tokenInfo['token'].decode('utf-8')
-            result = {'token': t, 'duration': 60}
-            session['token'] = t
-            return flask.jsonify(result=result)
+        tokenInfo = generate_auth_token(id, 600)
+        t = tokenInfo['token'].decode('utf-8')
+        result = {'token': t, 'duration': 60}
+        session['token'] = t
+        return flask.jsonify(result=result)
         
-        return "Unauthorized", 401
     except:
         return "Unauthorized", 401
 

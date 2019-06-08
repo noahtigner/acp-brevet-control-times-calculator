@@ -477,6 +477,7 @@ def login():
         session['id'] = user['id']
         if login_user(u, remember=form.remember_me.data):
             flash("login successful")
+            u.set_authenticated(True)
         else:
             flash("failed to login")
 
@@ -545,12 +546,16 @@ class User(UserMixin):
     def __init__(self, id, active=True):
         self.id = id #.decode('utf8')
         self.active = active
+        self.authenticated = False
 
     def is_active(self):
         return self.active
 
     def is_authenticated(self):
-        return True
+        return self.authenticated
+
+    def set_authenticated(self, auth):
+            self.authenticated = auth
 
     def is_anonymous(self):
         return False
@@ -593,6 +598,7 @@ def logout():
     logout_user()
     flash("Logged out.")
     session['token'] = None
+    u.set_authenticated(False)
     return redirect(url_for("index"))
 
 def generate_auth_token(id, expiration=600):
@@ -610,8 +616,8 @@ def verify_auth_token(token):
         return None    # invalid token
     return "Success"
 
+#@login_required
 @app.route("/api/token")
-@login_required
 def token():
     """
     Generates a token if the user has successfully logged in.
@@ -619,13 +625,20 @@ def token():
     """
 
     try:
+        
         # Generate a token
         id = session.get('id')
-        tokenInfo = generate_auth_token(id, 600)
-        t = tokenInfo['token'].decode('utf-8')
-        result = {'token': t, 'duration': 60}
-        session['token'] = t
-        return flask.jsonify(result=result)
+
+        user = User(id)
+        if user.is_authenticated():
+
+            tokenInfo = generate_auth_token(id, 600)
+            t = tokenInfo['token'].decode('utf-8')
+            result = {'token': t, 'duration': 60}
+            session['token'] = t
+            return flask.jsonify(result=result)
+        
+        return "Unauthorized", 401
     except:
         return "Unauthorized", 401
 

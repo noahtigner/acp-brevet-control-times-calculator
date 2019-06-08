@@ -548,17 +548,17 @@ class User(UserMixin):
         self.active = active
         # self.authenticated = False
 
-    def is_active(self):
-        return self.active
+    # def is_active(self):
+    #     return self.active
 
-    def is_authenticated(self):
-        return True
+    # def is_authenticated(self):
+    #     return True
 
-    # def set_authenticated(self, auth):
-    #         self.authenticated = auth
+    # # def set_authenticated(self, auth):
+    # #         self.authenticated = auth
 
-    def is_anonymous(self):
-        return False
+    # def is_anonymous(self):
+    #     return False
 
     def get_id(self):
         return self.id

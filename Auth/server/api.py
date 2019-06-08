@@ -618,7 +618,6 @@ def verify_auth_token(token):
 
 #@login_required
 @app.route("/api/token")
-@login_required
 def token():
     """
     Generates a token if the user has successfully logged in.
@@ -626,18 +625,24 @@ def token():
     """
 
     try:
+
         
         # Generate a token
         id = session.get('id')
+        user = User(id)
+        if user.is_autheticated():
+
 
         # user = User(id)
         # if user.is_authenticated():
 
-        tokenInfo = generate_auth_token(id, 600)
-        t = tokenInfo['token'].decode('utf-8')
-        result = {'token': t, 'duration': 60}
-        session['token'] = t
-        return flask.jsonify(result=result)
+            tokenInfo = generate_auth_token(id, 600)
+            t = tokenInfo['token'].decode('utf-8')
+            result = {'token': t, 'duration': 60}
+            session['token'] = t
+            return flask.jsonify(result=result)
+        else:
+            return "Unauthorized", 401
         
     except:
         return "Unauthorized", 401

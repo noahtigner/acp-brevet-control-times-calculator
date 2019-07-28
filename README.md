@@ -1,4 +1,4 @@
-# Project 7: Adding authentication and user interface to brevet time calculator service
+# ACP Brevet Control Times Calculator
 
 An improved version of the offical ACP calculator.
 
@@ -52,3 +52,5 @@ Users are not able to access the contents of the database on port 5000 without l
 Noah Tigner
 
 nzt@cs.uoregon.edu
+
+Created for CIS 330: Software Engineering at The University of Oregon

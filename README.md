@@ -1,6 +1,6 @@
 # ACP Brevet Control Times Calculator
 
-An improved version of the offical ACP calculator.
+A Full-Stack improvement to the official ACP calculator for Randonneurs USA
 
 ## ACP controle times
 
